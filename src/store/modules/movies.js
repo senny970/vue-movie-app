@@ -24,6 +24,7 @@ const moviesStore = {
         slicedIDs: ({top250IDs}) => (from, to) => top250IDs.slice(from, to),
         currentPage: ({currentPage}) => currentPage,
         moviesPerPage: ({moviesPerPage}) => moviesPerPage,
+        moviesLength: ({movies}) => Object.keys(movies).length,
     },
     mutations: {
         [MOVIES] (state, value) {

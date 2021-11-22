@@ -40,6 +40,7 @@ export default {
   background-size: cover;
   background-position: center;
   transition: all 0.2s ease;
+  /*filter: blur(5px);*/
 }
 
 .poster-page-bg::before {
