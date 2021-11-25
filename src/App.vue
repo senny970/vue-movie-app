@@ -6,6 +6,7 @@
         :current-page="currentPage"
         :per-page="moviesPerPage"
         :total="moviesLength"
+        @pageChanged="onPageChanged"
     />
   </div>
 </template>
@@ -30,12 +31,26 @@ export default {
   computed: {
     ...mapGetters('movies', ['moviesList', 'currentPage', 'moviesPerPage', 'moviesLength']),
   },
+  watch: {
+    '$route.query': {
+      handler: "onPageQueryChange",
+      immediate: true,
+      deep: true
+    }
+  },
   methods: {
-    ...mapActions('movies', ['fetchMovies']),
+    ...mapActions('movies', ['fetchMovies', 'changeCurrentPage']),
     onChangePoster(poster) {
       this.posterBg = poster;
     },
-  }
+    onPageChanged(page) {
+      this.$router.push({query: {page}});
+      /*this.changeCurrentPage(page);*/
+    },
+    onPageQueryChange({page = 1}) {
+      this.changeCurrentPage(Number(page));
+    }
+  },
 };
 </script>
 
