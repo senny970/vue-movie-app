@@ -2,6 +2,7 @@
   <div id="app">
     <Loader/>
     <PosterBg :poster="posterBg"/>
+    <Header/>
     <MoviesList :list="moviesList" @changePoster="onChangePoster" />
     <MoviesPagination
         :current-page="currentPage"
@@ -15,6 +16,7 @@
 <script>
 import {mapGetters} from 'vuex';
 import {mapActions} from 'vuex';
+import Header from "@/components/Header";
 import MoviesList from "@/components/MoviesList";
 import PosterBg from "@/components/PosterBg";
 import MoviesPagination from "@/components/MoviesPagination";
@@ -27,6 +29,7 @@ export default {
     PosterBg,
     MoviesPagination,
     Loader,
+    Header
   },
   data: () => ({
     posterBg: '',
