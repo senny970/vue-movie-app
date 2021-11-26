@@ -3,15 +3,16 @@
     <div class="movie-item-poster" :style="posterBg"></div>
     <div class="movie-info-wrap">
       <div class="movie-item-info">
-        <h3 class="movie-title">{{movie.Title}}</h3>
-        <span class="movie-year">{{movie.Year}}</span>
+        <h3 class="movie-title">{{ movie.Title }}</h3>
+        <span class="movie-year">{{ movie.Year }}</span>
       </div>
       <div class="movie-item-controls row no-gutters">
         <div class="col p-col-edit">
           <BButton class="control-button" size="md" block variant="outline-light">Edit</BButton>
         </div>
         <div class="col p-col-remove">
-          <BButton class="control-button" size="md" block variant="outline-light">Remove</BButton>
+          <BButton class="control-button" size="md" block variant="outline-light" @click="emitRemoveEvent">Remove
+          </BButton>
         </div>
       </div>
     </div>
@@ -33,7 +34,15 @@ export default {
         'background-image': `url(${this.movie.Poster})`
       }
     }
-  }
+  },
+  methods: {
+    emitRemoveEvent() {
+      this.$emit('removeItem', {
+        id: this.movie.imdbID,
+        title: this.movie.Title
+      });
+    },
+  },
 }
 </script>
 

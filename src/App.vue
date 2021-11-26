@@ -2,7 +2,7 @@
   <div id="app">
     <Loader/>
     <PosterBg :poster="posterBg"/>
-    <MoviesList :list="moviesList" @changePoster="onChangePoster"/>
+    <MoviesList :list="moviesList" @changePoster="onChangePoster" />
     <MoviesPagination
         :current-page="currentPage"
         :per-page="moviesPerPage"
