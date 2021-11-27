@@ -7,12 +7,17 @@
         <span class="movie-year">{{ movie.Year }}</span>
       </div>
       <div class="movie-item-controls row no-gutters">
-        <div class="col p-col-edit">
-          <BButton class="control-button" size="md" block variant="outline-light">Edit</BButton>
+        <div class="col pr-2">
+          <BButton size="md" block variant="outline-light">Edit</BButton>
         </div>
-        <div class="col p-col-remove">
-          <BButton class="control-button" size="md" block variant="outline-light" @click="emitRemoveEvent">Remove
-          </BButton>
+        <div class="col pl-2">
+          <BButton
+            size="md"
+            block
+            variant="outline-light"
+            @click="emitRemoveEvent"
+          >Remove</BButton
+          >
         </div>
       </div>
     </div>
@@ -103,13 +108,4 @@ export default {
   font-size: 14px;
   color: #ffffff;
 }
-
-.p-col-edit {
-  padding-right: 4px;
-}
-
-.p-col-remove {
-  padding-left: 4px;
-}
-
 </style>
