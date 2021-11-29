@@ -9,7 +9,13 @@ function serializeResponse(movies) {
     }, {});
 }
 
-const {MOVIES, CURRENT_PAGE, REMOVE_MOVIE, TOGGLE_SEARCH} = mutations;
+const {
+    MOVIES,
+    CURRENT_PAGE,
+    REMOVE_MOVIE,
+    TOGGLE_SEARCH,
+    ADD_MOVIE
+} = mutations;
 
 const moviesStore = {
     namespaced: true,
@@ -40,6 +46,9 @@ const moviesStore = {
         },
         [TOGGLE_SEARCH](state, status) {
             state.isSearch = status;
+        },
+        [ADD_MOVIE](state, id) {
+            state.top250IDs.push(id);
         }
     },
     actions: {
@@ -105,6 +114,9 @@ const moviesStore = {
         },
         toggleSearchState({commit}, status) {
             commit("TOGGLE_SEARCH", status);
+        },
+        addMovie({commit}, id) {
+            commit("ADD_MOVIE", id);
         }
     }
 };

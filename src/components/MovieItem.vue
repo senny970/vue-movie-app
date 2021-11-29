@@ -6,30 +6,58 @@
         <h3 class="movie-title">{{ movie.Title }}</h3>
         <span class="movie-year">{{ movie.Year }}</span>
       </div>
-      <div class="movie-item-controls row no-gutters">
-        <div class="col pr-2">
-          <BButton
-            size="md"
-            block
-            variant="outline-light"
-            @click="showInfoModalEvent"
-          >Info</BButton>
+      <template v-if="!this.isSearch">
+        <div class="movie-item-controls row no-gutters">
+          <div class="col pr-2">
+            <BButton
+                size="md"
+                block
+                variant="outline-light"
+                @click="showInfoModalEvent"
+            >Info
+            </BButton>
+          </div>
+          <div class="col pl-2">
+            <BButton
+                size="md"
+                block
+                variant="outline-light"
+                @click="emitRemoveEvent"
+            >Remove
+            </BButton>
+          </div>
         </div>
-        <div class="col pl-2">
-          <BButton
-            size="md"
-            block
-            variant="outline-light"
-            @click="emitRemoveEvent"
-          >Remove</BButton
-          >
+      </template>
+      <template v-else>
+        <div class="movie-item-controls row no-gutters">
+          <div class="col pr-2">
+            <BButton
+                size="md"
+                block
+                variant="outline-light"
+                @click="showInfoModalEvent"
+            >Info
+            </BButton>
+          </div>
+          <div class="col pl-2">
+            <BButton
+                class="favorite-button"
+                size="md"
+                block
+                variant="outline-light"
+                @click="addToFavoriteEvent"
+            ><BIcon class="favorite-icon" icon="heart-fill" style="color: #ffffff"/>
+            </BButton>
+          </div>
         </div>
-      </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
+import {mapGetters} from 'vuex';
+
 export default {
   name: "MovieItem",
   props: {
@@ -39,6 +67,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('movies', ['isSearch']),
     posterBg() {
       return {
         'background-image': `url(${this.movie.Poster})`
@@ -54,6 +83,9 @@ export default {
     },
     showInfoModalEvent() {
       this.$emit('showModal', this.movie.imdbID)
+    },
+    addToFavoriteEvent() {
+      this.$emit('addToFavorite', this.movie.imdbID, this.movie);
     }
   },
 }
@@ -115,5 +147,9 @@ export default {
 .movie-year {
   font-size: 14px;
   color: #ffffff;
+}
+
+.favorite-button:hover .favorite-icon >>> g {
+  color: #000000 !important;
 }
 </style>

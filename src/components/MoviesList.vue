@@ -1,25 +1,26 @@
 <template>
-<BContainer>
-  <h3 class="list-title">{{listTitle}}</h3>
-  <BRow>
-    <template v-if="isExist">
-      <BCol cols="3" v-for="(movie, key) in list" :key="key">
-        <MovieItem
-            :movie="movie"
-            @mouseover.native="onMouseOver(movie.Poster)"
-            @removeItem="onRemoveItem"
-            @showModal="onShowMovieInfo"
-        />
-      </BCol>
-    </template>
-    <template v-else>
-      <div>Empty list</div>
-    </template>
-  </BRow>
-  <BModal class="movie-modal-body" :id="movieInfoModalID" size="xl" hide-footer hide-header>
-    <MovieInfoModal :movie="selectedMovie" @closeModal="onCloseModal"/>
-  </BModal>
-</BContainer>
+  <BContainer>
+    <h3 class="list-title">{{ listTitle }}</h3>
+    <BRow>
+      <template v-if="isExist">
+        <BCol cols="3" v-for="(movie, key) in list" :key="key">
+          <MovieItem
+              :movie="movie"
+              @mouseover.native="onMouseOver(movie.Poster)"
+              @removeItem="onRemoveItem"
+              @showModal="onShowMovieInfo"
+              @addToFavorite="onAddToFavorite"
+          />
+        </BCol>
+      </template>
+      <template v-else>
+        <div>Empty list</div>
+      </template>
+    </BRow>
+    <BModal class="movie-modal-body" :id="movieInfoModalID" size="xl" hide-footer hide-header>
+      <MovieInfoModal :movie="selectedMovie" @closeModal="onCloseModal"/>
+    </BModal>
+  </BContainer>
 </template>
 
 <script>
@@ -56,7 +57,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('movies', ['removeMovie']),
+    ...mapActions('movies', ['removeMovie', 'addMovie']),
     ...mapActions(['showNotify']),
     onMouseOver(poster) {
       this.$emit('changePoster', poster);
@@ -66,7 +67,7 @@ export default {
 
       if (isConfirm) {
         this.removeMovie(id);
-        this.showNotify( {
+        this.showNotify({
           msg: "Movie deleted successful",
           variant: "success",
           title: "Success"
@@ -79,6 +80,18 @@ export default {
     },
     onCloseModal() {
       this.$bvModal.hide(this.movieInfoModalID);
+    },
+    async onAddToFavorite(id, movie) {
+      const isConfirm = await this.$bvModal.msgBoxConfirm(`Add to favorite ${movie.Title} ?`);
+
+      if (isConfirm) {
+        this.showNotify({
+          msg: "Movie add successful",
+          variant: "success",
+          title: "Success"
+        })
+        this.addMovie(id);
+      }
     }
   },
 }
@@ -92,8 +105,3 @@ export default {
 }
 </style>
 
-<style>
-.modal-body {
-  padding: 0 !important;
-}
-</style>
