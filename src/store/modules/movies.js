@@ -3,100 +3,110 @@ import IDs from "@/store/mock/imdb250";
 import mutations from "@/store/mutations";
 
 function serializeResponse(movies) {
-  return movies.reduce((acc, movie) => {
-    acc[movie.imdbID] = movie;
-    return acc;
-  }, {});
+    return movies.reduce((acc, movie) => {
+        acc[movie.imdbID] = movie;
+        return acc;
+    }, {});
 }
 
-const { MOVIES, CURRENT_PAGE, REMOVE_MOVIE, TOGGLE_SEARCH } = mutations;
+const {MOVIES, CURRENT_PAGE, REMOVE_MOVIE, TOGGLE_SEARCH} = mutations;
 
 const moviesStore = {
-  namespaced: true,
-  state: {
-    top250IDs: IDs,
-    moviesPerPage: 12,
-    currentPage: 1,
-    movies: {},
-    isSearch: false
-  },
-  getters: {
-    moviesList: ({ movies }) => movies,
-    slicedIDs: ({ top250IDs }) => (from, to) => top250IDs.slice(from, to),
-    currentPage: ({ currentPage }) => currentPage,
-    moviesPerPage: ({ moviesPerPage }) => moviesPerPage,
-    moviesLength: ({ top250IDs }) => Object.keys(top250IDs).length,
-    isSearch: ({ isSearch }) => isSearch
-  },
-  mutations: {
-    [MOVIES](state, value) {
-      state.movies = value;
+    namespaced: true,
+    state: {
+        top250IDs: IDs,
+        moviesPerPage: 12,
+        currentPage: 1,
+        movies: {},
+        isSearch: false
     },
-    [CURRENT_PAGE](state, value) {
-      state.currentPage = value;
+    getters: {
+        moviesList: ({movies}) => movies,
+        slicedIDs: ({top250IDs}) => (from, to) => top250IDs.slice(from, to),
+        currentPage: ({currentPage}) => currentPage,
+        moviesPerPage: ({moviesPerPage}) => moviesPerPage,
+        moviesLength: ({top250IDs}) => Object.keys(top250IDs).length,
+        isSearch: ({isSearch}) => isSearch
     },
-    [REMOVE_MOVIE](state, index) {
-      state.top250IDs.splice(index, 1);
-    },
-    [TOGGLE_SEARCH](state, status) {
-      state.isSearch = status;
-    }
-  },
-  actions: {
-    async fetchMovies({ getters, commit, dispatch }) {
-      try {
-        dispatch("toggleLoader", true, { root: true });
-        const { currentPage, moviesPerPage, slicedIDs } = getters;
-        const from = currentPage * moviesPerPage - moviesPerPage;
-        const to = currentPage * moviesPerPage;
-        const moviesToFetch = slicedIDs(from, to);
-        const requests = moviesToFetch.map((id) => axios.get(`/?i=${id}`));
-        /*console.log(requests);*/
-        const response = await Promise.all(requests);
-        const movies = serializeResponse(response);
-        console.log(movies);
-        commit(MOVIES, movies);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        dispatch("toggleLoader", false, { root: true });
-      }
-    },
-    changeCurrentPage({ commit, dispatch }, page) {
-      commit("CURRENT_PAGE", page);
-      dispatch("fetchMovies");
-    },
-    removeMovie({ commit, dispatch, state }, id) {
-      const index = state.top250IDs.findIndex(item => item === id);
-
-      if (index !== -1) {
-        commit("REMOVE_MOVIE", index);
-        dispatch("fetchMovies");
-      }
-    },
-    async searchMovies({ commit, dispatch }, query) {
-      try {
-        dispatch("toggleLoader", true, { root: true });
-        const response = await axios.get(`/?s=${query}`);
-        if (response.Error) {
-          throw Error(response.Error);
+    mutations: {
+        [MOVIES](state, value) {
+            state.movies = value;
+        },
+        [CURRENT_PAGE](state, value) {
+            state.currentPage = value;
+        },
+        [REMOVE_MOVIE](state, index) {
+            state.top250IDs.splice(index, 1);
+        },
+        [TOGGLE_SEARCH](state, status) {
+            state.isSearch = status;
         }
-        const movies = serializeResponse(response.Search);
-        commit(MOVIES, movies);
-      } catch (err) {
-        dispatch("showNotify", {
-          msg: err.message,
-          title: "Error",
-          variant: "danger"
-        }, { root: true });
-      } finally {
-        dispatch("toggleLoader", false, { root: true });
-      }
     },
-    toggleSearchState({ commit }, status) {
-      commit("TOGGLE_SEARCH", status);
+    actions: {
+        async fetchMovies({getters, commit, dispatch}) {
+            try {
+                dispatch("toggleLoader", true, {root: true});
+                const {currentPage, moviesPerPage, slicedIDs} = getters;
+                const from = currentPage * moviesPerPage - moviesPerPage;
+                const to = currentPage * moviesPerPage;
+                const moviesToFetch = slicedIDs(from, to);
+                const requests = moviesToFetch.map((id) => axios.get(`/?i=${id}`));
+                const response = await Promise.all(requests);
+                const movies = serializeResponse(response);
+                console.log(movies);
+                commit(MOVIES, movies);
+            } catch (err) {
+                console.log(err);
+            } finally {
+                dispatch("toggleLoader", false, {root: true});
+            }
+        },
+        changeCurrentPage({commit, dispatch}, page) {
+            commit("CURRENT_PAGE", page);
+            dispatch("fetchMovies");
+        },
+        removeMovie({commit, dispatch, state}, id) {
+            const index = state.top250IDs.findIndex(item => item === id);
+
+            if (index !== -1) {
+                commit("REMOVE_MOVIE", index);
+                dispatch("fetchMovies");
+            }
+        },
+        async searchMovies({commit, dispatch}, query) {
+            try {
+                dispatch("toggleLoader", true, {root: true});
+                const searchResponse = await axios.get(`/?s=${query}`);
+
+                if (searchResponse.Error) {
+                    throw Error(searchResponse.Error);
+                }
+
+                let searchMoviesIDs = [];
+
+                searchResponse.Search.reduce((acc, response) => {
+                    return searchMoviesIDs.push(response.imdbID);
+                }, 0);
+
+                const requests = searchMoviesIDs.map((id) => axios.get(`/?i=${id}`));
+                const moviesResponse = await Promise.all(requests);
+                const movies = serializeResponse(moviesResponse);
+
+                commit(MOVIES, movies);
+            } catch (err) {
+                dispatch("showNotify", {
+                    msg: err.message,
+                    title: "Error",
+                    variant: "danger"
+                }, {root: true});
+            } finally {
+                dispatch("toggleLoader", false, {root: true});
+            }
+        },
+        toggleSearchState({commit}, status) {
+            commit("TOGGLE_SEARCH", status);
+        }
     }
-  }
 };
 
 export default moviesStore;
