@@ -14,7 +14,8 @@ const {
     CURRENT_PAGE,
     REMOVE_MOVIE,
     TOGGLE_SEARCH,
-    ADD_MOVIE
+    ADD_MOVIE,
+    SETUP_TOP250
 } = mutations;
 
 const moviesStore = {
@@ -49,11 +50,16 @@ const moviesStore = {
         },
         [ADD_MOVIE](state, id) {
             state.top250IDs.push(id);
+        },
+        [SETUP_TOP250](state, array) {
+            state.top250IDs = [];
+            state.top250IDs = array;
         }
     },
     actions: {
         async fetchMovies({getters, commit, dispatch}) {
             try {
+                commit("SETUP_TOP250", IDs);
                 dispatch("toggleLoader", true, {root: true});
                 const {currentPage, moviesPerPage, slicedIDs} = getters;
                 const from = currentPage * moviesPerPage - moviesPerPage;
@@ -97,6 +103,8 @@ const moviesStore = {
                     return searchMoviesIDs.push(response.imdbID);
                 }, 0);
 
+                //commit("SETUP_TOP250", searchMoviesIDs);
+
                 const requests = searchMoviesIDs.map((id) => axios.get(`/?i=${id}`));
                 const moviesResponse = await Promise.all(requests);
                 const movies = serializeResponse(moviesResponse);
@@ -117,7 +125,7 @@ const moviesStore = {
         },
         addMovie({commit}, id) {
             commit("ADD_MOVIE", id);
-        }
+        },
     }
 };
 
