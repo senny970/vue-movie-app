@@ -1,5 +1,5 @@
 <template>
-  <div class="movie-item mb-3">
+  <div class="movie-item mb-3" @click="showInfoModalEvent">
     <div class="movie-item-poster" :style="posterBg"></div>
     <div class="movie-info-wrap">
       <div class="movie-item-info">
