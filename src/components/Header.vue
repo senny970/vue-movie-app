@@ -40,6 +40,7 @@ export default {
       }
     },
     onClickHome() {
+      this.fetchMovies();
       this.$router.push('/');
     }
   }
