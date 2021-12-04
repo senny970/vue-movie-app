@@ -2,7 +2,7 @@
   <header class="header">
     <BNavbar class="navbar" type="dark" variant="dark">
       <BContainer>
-        <BNavbarBrand href="#">MovieDB</BNavbarBrand>
+        <BNavbarBrand class="home-url" href="#" @click="onClickHome">MovieDB</BNavbarBrand>
         <BNavForm class="nav-form">
           <BFormInput
             class="mr-sm-2 search-input"
@@ -38,6 +38,9 @@ export default {
         this.fetchMovies();
         this.toggleSearchState(false);
       }
+    },
+    onClickHome() {
+      this.$router.push('/');
     }
   }
 };
@@ -60,5 +63,13 @@ export default {
 
 .nav-form {
   display: flex;
+}
+
+.home-url {
+  transition: all 0.2s ease;
+}
+
+.home-url:hover {
+  transform: scale(1.2);
 }
 </style>
