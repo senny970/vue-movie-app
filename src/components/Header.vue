@@ -8,7 +8,7 @@
             class="mr-sm-2 search-input"
             placeholder="Search"
             v-model="searchValue"
-            debounce="500"
+            debounce="1000"
           >
           </BFormInput>
         </BNavForm>
@@ -40,7 +40,14 @@ export default {
       }
     },
     onClickHome() {
-      this.fetchMovies();
+      const searchInput = document.querySelector('.search-input');
+
+      if (searchInput) {
+        searchInput.value = '';
+        this.toggleSearchState(false);
+        this.fetchMovies();
+      }
+
       this.$router.push('/');
     }
   }
