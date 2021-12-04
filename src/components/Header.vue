@@ -2,7 +2,12 @@
   <header class="header">
     <BNavbar class="navbar" type="dark" variant="dark">
       <BContainer>
-        <BNavbarBrand class="home-url" href="#" @click="onClickHome">MovieDB</BNavbarBrand>
+        <div class="logo">
+          <BNavbarBrand class="home-url" href="#" @click="onClickHome">MovieDB</BNavbarBrand>
+          <BIcon class="movie-icon" icon="film"/>
+        </div>
+        <BIcon class="favorites-button" scale="1.5" icon="heart-fill"/>
+        <BBadge class="favorites-count" variant="primary">4</BBadge>
         <BNavForm class="nav-form">
           <BFormInput
             class="mr-sm-2 search-input"
@@ -73,11 +78,37 @@ export default {
   display: flex;
 }
 
-.home-url {
+.favorites-button {
+  margin-right: 15px;
+  margin-left: auto;
+  cursor: pointer;
+  color: white;
   transition: all 0.2s ease;
 }
 
-.home-url:hover {
+.favorites-button:hover {
+  transform: scale(1.3);
+}
+
+.favorites-count {
+  margin-right: 10px;
+  align-self: self-start;
+  background-color: rgba(102, 16, 243, 1);
+}
+
+.movie-icon {
+  color: #ffffff;
+}
+
+.logo {
+  transition: all 0.2s ease;
+}
+
+.logo:hover {
   transform: scale(1.2);
+}
+
+.home-url {
+  margin-right: 10px;
 }
 </style>
