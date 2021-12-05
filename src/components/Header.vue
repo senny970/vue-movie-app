@@ -6,8 +6,10 @@
           <BNavbarBrand class="home-url" href="#" @click="onClickHome">MovieDB</BNavbarBrand>
           <BIcon class="movie-icon" icon="film"/>
         </div>
-        <BIcon class="favorites-button" scale="1.5" icon="heart-fill"/>
-        <BBadge class="favorites-count" variant="primary">4</BBadge>
+        <BIcon class="favorites-button" scale="1.5" icon="heart-fill" @click="onClickFavorites"/>
+        <template v-if="this.favoritesLength">
+          <BBadge class="favorites-count" variant="primary">{{this.favoritesLength}}</BBadge>
+        </template>
         <BNavForm class="nav-form">
           <BFormInput
             class="mr-sm-2 search-input"
@@ -24,6 +26,7 @@
 
 <script>
 import { mapActions } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "Header",
@@ -33,8 +36,17 @@ export default {
   watch: {
     searchValue: "onSearchValueChanged"
   },
+  computed: {
+    ...mapGetters('movies', ['favoritesLength']),
+  },
   methods: {
-    ...mapActions("movies", ["searchMovies", "fetchMovies", "toggleSearchState"]),
+    ...mapActions("movies",
+      ["searchMovies",
+        "fetchMovies",
+        "toggleSearchState",
+        "toggleFavoritesState",
+        "showFavoriteMovies"]
+    ),
     onSearchValueChanged(value) {
       if (value) {
         this.searchMovies(value);
@@ -45,6 +57,7 @@ export default {
       }
     },
     onClickHome() {
+      this.toggleFavoritesState(false);
       const searchInput = document.querySelector('.search-input');
 
       if (searchInput) {
@@ -53,7 +66,12 @@ export default {
         this.fetchMovies();
       }
 
-      this.$router.push('/');
+      //this.$router.push('/');
+    },
+    onClickFavorites() {
+      this.toggleSearchState(false);
+      this.toggleFavoritesState(true);
+      this.showFavoriteMovies();
     }
   }
 };

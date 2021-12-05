@@ -1,12 +1,12 @@
 <template>
-  <div class="movie-item mb-3" @click="showInfoModalEvent">
+  <div class="movie-item mb-3">
     <div class="movie-item-poster" :style="posterBg"></div>
     <div class="movie-info-wrap">
       <div class="movie-item-info">
         <h3 class="movie-title">{{ movie.Title }}</h3>
         <span class="movie-year">{{ movie.Year }}</span>
       </div>
-      <template v-if="!this.isSearch">
+      <template v-if="this.isFavorites">
         <div class="movie-item-controls row no-gutters">
           <div class="col pr-2">
             <BButton
@@ -67,7 +67,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('movies', ['isSearch']),
+    ...mapGetters('movies', ['isFavorites']),
     posterBg() {
       return {
         'background-image': `url(${this.movie.Poster})`

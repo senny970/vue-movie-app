@@ -1,5 +1,5 @@
 import axios from "@/plugins/axios";
-import IDs from "@/store/mock/imdb250";
+import top25IDs from "@/store/mock/imdb250";
 import mutations from "@/store/mutations";
 
 function serializeResponse(movies) {
@@ -12,28 +12,33 @@ function serializeResponse(movies) {
 const {
     MOVIES,
     CURRENT_PAGE,
-    REMOVE_MOVIE,
+    REMOVE_FAVORITE_MOVIE,
     TOGGLE_SEARCH,
+    TOGGLE_FAVORITES,
     ADD_MOVIE,
-    SETUP_TOP250
+    SETUP_MOVIE_IDS
 } = mutations;
 
 const moviesStore = {
     namespaced: true,
     state: {
-        top250IDs: IDs,
+        movieIDs: top25IDs,
+        favoriteMoviesIDs: [],
         moviesPerPage: 12,
         currentPage: 1,
         movies: {},
-        isSearch: false
+        isSearch: false,
+        isFavorites: false
     },
     getters: {
         moviesList: ({movies}) => movies,
-        slicedIDs: ({top250IDs}) => (from, to) => top250IDs.slice(from, to),
+        slicedIDs: ({movieIDs}) => (from, to) => movieIDs.slice(from, to),
         currentPage: ({currentPage}) => currentPage,
         moviesPerPage: ({moviesPerPage}) => moviesPerPage,
-        moviesLength: ({top250IDs}) => Object.keys(top250IDs).length,
-        isSearch: ({isSearch}) => isSearch
+        moviesLength: ({movieIDs}) => Object.keys(movieIDs).length,
+        favoritesLength: ({favoriteMoviesIDs}) => Object.keys(favoriteMoviesIDs).length,
+        isSearch: ({isSearch}) => isSearch,
+        isFavorites: ({isFavorites}) => isFavorites,
     },
     mutations: {
         [MOVIES](state, value) {
@@ -42,24 +47,27 @@ const moviesStore = {
         [CURRENT_PAGE](state, value) {
             state.currentPage = value;
         },
-        [REMOVE_MOVIE](state, index) {
-            state.top250IDs.splice(index, 1);
+        [REMOVE_FAVORITE_MOVIE](state, index) {
+            state.movieIDs.splice(index, 1);
         },
         [TOGGLE_SEARCH](state, status) {
             state.isSearch = status;
         },
-        [ADD_MOVIE](state, id) {
-            state.top250IDs.push(id);
+        [TOGGLE_FAVORITES](state, status){
+            state.isFavorites = status;
         },
-        [SETUP_TOP250](state, array) {
-            state.top250IDs = [];
-            state.top250IDs = array;
+        [ADD_MOVIE](state, id) {
+            state.favoriteMoviesIDs.push(id);
+        },
+        [SETUP_MOVIE_IDS](state, array) {
+            state.movieIDs = [];
+            state.movieIDs = array;
         }
     },
     actions: {
         async fetchMovies({getters, commit, dispatch}) {
             try {
-                commit("SETUP_TOP250", IDs);
+                commit("SETUP_MOVIE_IDS", top25IDs);
                 dispatch("toggleLoader", true, {root: true});
                 const {currentPage, moviesPerPage, slicedIDs} = getters;
                 const from = currentPage * moviesPerPage - moviesPerPage;
@@ -80,11 +88,16 @@ const moviesStore = {
             commit("CURRENT_PAGE", page);
             dispatch("fetchMovies");
         },
-        removeMovie({commit, dispatch, state}, id) {
-            const index = state.top250IDs.findIndex(item => item === id);
+        removeFavoriteMovie({commit, dispatch, state}, id) {
+            const index = state.favoriteMoviesIDs.findIndex(item => item === id);
 
             if (index !== -1) {
-                commit("REMOVE_MOVIE", index);
+                commit("REMOVE_FAVORITE_MOVIE", index);
+                dispatch("showFavoriteMovies");
+            }
+
+            if (index === 0) {
+                state.isFavorites = false;
                 dispatch("fetchMovies");
             }
         },
@@ -123,9 +136,30 @@ const moviesStore = {
         toggleSearchState({commit}, status) {
             commit("TOGGLE_SEARCH", status);
         },
+        toggleFavoritesState({commit}, status) {
+            commit("TOGGLE_FAVORITES", status);
+        },
         addMovie({commit}, id) {
             commit("ADD_MOVIE", id);
         },
+        async showFavoriteMovies({commit, dispatch, state}) {
+            try {
+                dispatch("toggleLoader", true, {root: true});
+                const requests = state.favoriteMoviesIDs.map((id) => axios.get(`/?i=${id}`));
+                const moviesResponse = await Promise.all(requests);
+                const movies = serializeResponse(moviesResponse);
+                commit("SETUP_MOVIE_IDS", state.favoriteMoviesIDs);
+                commit("MOVIES", movies);
+            } catch (err) {
+                dispatch("showNotify", {
+                    msg: err.message,
+                    title: "Error",
+                    variant: "danger"
+                }, {root: true});
+            } finally {
+                dispatch("toggleLoader", false, {root: true});
+            }
+        }
     }
 };
 

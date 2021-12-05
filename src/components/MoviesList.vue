@@ -14,7 +14,9 @@
         </BCol>
       </template>
       <template v-else>
-        <div>Empty list</div>
+        <div>
+          <h1>Empty</h1>
+        </div>
       </template>
     </BRow>
     <BModal class="movie-modal-body" :id="movieInfoModalID" size="xl" hide-footer hide-header>
@@ -45,19 +47,25 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('movies', ['isSearch']),
+    ...mapGetters('movies', ['isSearch', 'isFavorites']),
     isExist() {
       return Boolean(Object.keys(this.list).length);
     },
     listTitle() {
-      return this.isSearch ? 'Search results' : 'IMDB Top 250';
+      if (this.isSearch)
+        return 'Search results';
+
+      if (this.isFavorites)
+        return 'Favorites';
+
+      return 'IMDB Top 250';
     },
     selectedMovie() {
       return this.selectedMovieID ? this.list[this.selectedMovieID] : null;
     }
   },
   methods: {
-    ...mapActions('movies', ['removeMovie', 'addMovie']),
+    ...mapActions('movies', ['removeFavoriteMovie', 'addMovie']),
     ...mapActions(['showNotify']),
     onMouseOver(poster) {
       this.$emit('changePoster', poster);
@@ -66,7 +74,7 @@ export default {
       const isConfirm = await this.$bvModal.msgBoxConfirm(`Remove ${title} ?`);
 
       if (isConfirm) {
-        this.removeMovie(id);
+        this.removeFavoriteMovie(id);
         this.showNotify({
           msg: "Movie deleted successful",
           variant: "success",
