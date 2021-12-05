@@ -91,6 +91,7 @@ export default {
     },
     async onAddToFavorite(id, movie) {
       const isConfirm = await this.$bvModal.msgBoxConfirm(`Add to favorite ${movie.Title} ?`);
+      console.log(isConfirm);
 
       if (isConfirm) {
         this.showNotify({
