@@ -15,7 +15,9 @@ const {
     REMOVE_FAVORITE_MOVIE,
     TOGGLE_SEARCH,
     TOGGLE_FAVORITES,
-    ADD_MOVIE,
+    ADD_FAVORITE_MOVIE,
+    SAVE_FAVORITE_MOVIES,
+    LOAD_FAVORITE_MOVIES,
     SETUP_MOVIE_IDS
 } = mutations;
 
@@ -48,7 +50,7 @@ const moviesStore = {
             state.currentPage = value;
         },
         [REMOVE_FAVORITE_MOVIE](state, index) {
-            state.movieIDs.splice(index, 1);
+            state.favoriteMoviesIDs.splice(index, 1);
         },
         [TOGGLE_SEARCH](state, status) {
             state.isSearch = status;
@@ -56,8 +58,19 @@ const moviesStore = {
         [TOGGLE_FAVORITES](state, status){
             state.isFavorites = status;
         },
-        [ADD_MOVIE](state, id) {
+        [ADD_FAVORITE_MOVIE](state, id) {
             state.favoriteMoviesIDs.push(id);
+        },
+        [SAVE_FAVORITE_MOVIES](state) {
+            const favorites = state.favoriteMoviesIDs;
+            localStorage.setItem("favorites", JSON.stringify(favorites));
+        },
+        [LOAD_FAVORITE_MOVIES](state) {
+            const favoritesRecord = localStorage.getItem("favorites");
+
+            if (favoritesRecord) {
+                state.favoriteMoviesIDs = JSON.parse(localStorage.getItem("favorites"));
+            }
         },
         [SETUP_MOVIE_IDS](state, array) {
             state.movieIDs = [];
@@ -76,7 +89,6 @@ const moviesStore = {
                 const requests = moviesToFetch.map((id) => axios.get(`/?i=${id}`));
                 const response = await Promise.all(requests);
                 const movies = serializeResponse(response);
-                console.log(movies);
                 commit(MOVIES, movies);
             } catch (err) {
                 console.log(err);
@@ -93,6 +105,7 @@ const moviesStore = {
 
             if (index !== -1) {
                 commit("REMOVE_FAVORITE_MOVIE", index);
+                commit("SAVE_FAVORITE_MOVIES");
                 dispatch("showFavoriteMovies");
             }
 
@@ -116,8 +129,6 @@ const moviesStore = {
                     return searchMoviesIDs.push(response.imdbID);
                 }, 0);
 
-                //commit("SETUP_TOP250", searchMoviesIDs);
-
                 const requests = searchMoviesIDs.map((id) => axios.get(`/?i=${id}`));
                 const moviesResponse = await Promise.all(requests);
                 const movies = serializeResponse(moviesResponse);
@@ -140,15 +151,8 @@ const moviesStore = {
             commit("TOGGLE_FAVORITES", status);
         },
         addMovie({commit}, id) {
-            commit("ADD_MOVIE", id);
-
-/*          var names = [];
-            names[0] = prompt("New member name?");
-            localStorage.setItem("names", JSON.stringify(names));
-            var storedNames = JSON.parse(localStorage.getItem("names"));
-
-            localstorage.names = JSON.stringify(names);
-            var storedNames = JSON.parse(localStorage.names);*/
+            commit("ADD_FAVORITE_MOVIE", id);
+            commit("SAVE_FAVORITE_MOVIES");
         },
         async showFavoriteMovies({commit, dispatch, state}) {
             try {
@@ -167,6 +171,9 @@ const moviesStore = {
             } finally {
                 dispatch("toggleLoader", false, {root: true});
             }
+        },
+        loadFavoriteMovies({commit}) {
+            commit("LOAD_FAVORITE_MOVIES");
         }
     }
 };

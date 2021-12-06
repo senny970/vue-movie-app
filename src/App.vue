@@ -47,8 +47,11 @@ export default {
       deep: true
     }
   },
+  mounted() {
+    this.loadFavoriteMovies();
+  },
   methods: {
-    ...mapActions('movies', ['fetchMovies', 'changeCurrentPage']),
+    ...mapActions('movies', ['fetchMovies', 'changeCurrentPage', 'loadFavoriteMovies']),
     onChangePoster(poster) {
       this.posterBg = poster;
     },

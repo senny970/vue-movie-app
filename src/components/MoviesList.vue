@@ -76,7 +76,7 @@ export default {
       if (isConfirm) {
         this.removeFavoriteMovie(id);
         this.showNotify({
-          msg: "Movie deleted successful",
+          msg: `${title} deleted successful!`,
           variant: "success",
           title: "Success"
         })
@@ -91,11 +91,10 @@ export default {
     },
     async onAddToFavorite(id, movie) {
       const isConfirm = await this.$bvModal.msgBoxConfirm(`Add to favorite ${movie.Title} ?`);
-      console.log(isConfirm);
 
       if (isConfirm) {
         this.showNotify({
-          msg: "Movie add successful",
+          msg: `${movie.Title} add to favorites!`,
           variant: "success",
           title: "Success"
         })
