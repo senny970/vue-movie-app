@@ -119,6 +119,8 @@ export default {
 }
 
 .logo {
+  display: flex;
+  align-items: center;
   transition: all 0.2s ease;
 }
 
