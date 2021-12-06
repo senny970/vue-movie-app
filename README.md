@@ -1,6 +1,7 @@
 # vue-movie-app
 
-##GitHub Pages
+#GitHub Pages
+
 [Vue-movie-app](https://senny970.github.io/vue-movie-app/ "Vue-movie-app")
 
 ## Project setup
