@@ -109,7 +109,7 @@ const moviesStore = {
                 dispatch("showFavoriteMovies");
             }
 
-            if (index === 0) {
+            if (!state.favoriteMoviesIDs.length) {
                 state.isFavorites = false;
                 dispatch("fetchMovies");
             }

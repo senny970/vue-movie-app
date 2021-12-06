@@ -15,7 +15,6 @@
       </template>
       <template v-else>
         <div>
-          <h1>Empty</h1>
         </div>
       </template>
     </BRow>
