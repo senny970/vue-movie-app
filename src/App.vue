@@ -5,12 +5,17 @@
     <PosterBg :poster="posterBg"/>
     <Header/>
     <MoviesList :list="moviesList" @changePoster="onChangePoster" />
-    <MoviesPagination
-        :current-page="currentPage"
-        :per-page="moviesPerPage"
-        :total="moviesLength"
-        @pageChanged="onPageChanged"
-    />
+    <template v-if="!this.isFavorites && !this.isSearch">
+      <MoviesPagination
+          :current-page="currentPage"
+          :per-page="moviesPerPage"
+          :total="moviesLength"
+          @pageChanged="onPageChanged"
+      />
+    </template>
+    <template v-else>
+      <div class="movies-bottom-mr"></div>
+    </template>
   </div>
 </template>
 
@@ -38,7 +43,14 @@ export default {
     posterBg: '',
   }),
   computed: {
-    ...mapGetters('movies', ['moviesList', 'currentPage', 'moviesPerPage', 'moviesLength']),
+    ...mapGetters('movies',
+        ['moviesList',
+          'currentPage',
+          'moviesPerPage',
+          'moviesLength',
+          'isSearch',
+          'isFavorites']
+    ),
   },
   watch: {
     '$route.query': {
@@ -75,5 +87,9 @@ export default {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.movies-bottom-mr {
+  margin-top: 25px;
 }
 </style>
